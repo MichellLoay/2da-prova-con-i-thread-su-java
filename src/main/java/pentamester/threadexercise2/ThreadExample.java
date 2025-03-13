@@ -1,7 +1,7 @@
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
+
 package pentamester.threadexercise2;
 
 /**
@@ -12,16 +12,42 @@ public class ThreadExample {
 
     public static void main(String[] args) {
 
-        MioThread[] threads = new MioThread[5];
+        Thread[] threads = new Thread[5];
 
         for (int i = 0; i < 5; i++) {
             String threadName = "MioThread-" + (i + 1);
             int priority = Thread.NORM_PRIORITY;
-            threads[i] = new MioThread(threadName, priority);
+            threads[i] = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Thread currentThread = Thread.currentThread();
+                    synchronized (System.out) {
+                        System.out.println("--- Informazioni di " + currentThread.getName() + " ---");
+                        System.out.println("Nome: " + currentThread.getName());
+                        System.out.println("ID: " + currentThread.getId());
+                        System.out.println("Priorità: " + currentThread.getPriority());
+                        System.out.println("È vivo? " + currentThread.isAlive());
+                        System.out.println("Info completa: " + currentThread.toString());
+                        System.out.println("Sto dormendo per 5 secondi...");
+                    }
+
+                    try {
+                        Thread.sleep(5000);
+                    } catch (InterruptedException e) {
+                        System.out.println(currentThread.getName() + " è stato interrotto durante il sonno.");
+                    }
+
+                    synchronized (System.out) {
+                        System.out.println(currentThread.getName() + " ha terminato.\n");
+                    }
+                }
+            }, threadName);
+
+            threads[i].setPriority(priority);
             threads[i].start();
         }
 
-        for (MioThread t : threads) {
+        for (Thread t : threads) {
             try {
                 t.join();
             } catch (InterruptedException e) {
@@ -32,5 +58,3 @@ public class ThreadExample {
         System.out.println("Main terminato!");
     }
 }
-
-
